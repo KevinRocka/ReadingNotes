@@ -23,7 +23,7 @@ Author : Rocka
 * ContextImpl是Context的具体实现，ContextImpl是通过Activity的attach方法来和Activity建立关联的，在attach方法中Activity还会完成Window的创建并建立自己和Window的关联，这样当window接收到外部输入事件后就可以将事件传递给Activity。 [这里可能有误，应该是Activity将事件传递给window]
 
 * Activity启动过程
- ![](/Users/Rocka/Desktop/Android Note/《Android 开发艺术探索》/images/Activity.png) 
+ ![image](https://github.com/KevinRocka/ReadingNotes/blob/master/%E3%80%8AAndroid%20%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2%E3%80%8B/images/Activity.png?raw=true)
 
 ## Service 工作流程
 * Service分为两种工作状态,两种状态可以共存。
@@ -40,10 +40,10 @@ Author : Rocka
 	```
 
 * 启动过程
- ![](/Users/Rocka/Desktop/Android Note/《Android 开发艺术探索》/images/Service1.png) 
+![image](https://github.com/KevinRocka/ReadingNotes/blob/master/%E3%80%8AAndroid%20%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2%E3%80%8B/images/Service1.png?raw=true)
  
 * 绑定过程
- ![](/Users/Rocka/Desktop/Android Note/《Android 开发艺术探索》/images/Service2.png) 
+![image](https://github.com/KevinRocka/ReadingNotes/blob/master/%E3%80%8AAndroid%20%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2%E3%80%8B/images/Service2.png?raw=true)
 
 ## BroadcastReceiver 工作流程
 
@@ -51,16 +51,15 @@ Author : Rocka
 * 一个应用处于停止态分为两种类型：1.应用安装未运行；2.应用被手动或被其他应用强停了，从Android3.1开始，处于停止状态的应用无法接收开机广播
 * 广播静态注册在应用安装的时候由系统自动完成注册，具体是由PackageManagerService完成整个注册过程，其他三大组件也是在应用安装时PMS解析并注册的。
 * 动态注册过程
-	 ![](/Users/Rocka/Desktop/Android Note/《Android 开发艺术探索》/images/BroadcastReceiver1.png)
+	 ![image](https://github.com/KevinRocka/ReadingNotes/blob/master/%E3%80%8AAndroid%20%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2%E3%80%8B/images/BroadcastReceiver1.png?raw=true)
 	 
 * 发送和接收过程
-	![](/Users/Rocka/Desktop/Android Note/《Android 开发艺术探索》/images/BroadcastReceiver2.png)
+	 ![image](https://github.com/KevinRocka/ReadingNotes/blob/master/%E3%80%8AAndroid%20%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2%E3%80%8B/images/BroadcastReceiver2.png?raw=true)
 	
 ## ContentProvider 工作流程
 
 ContentProvider启动流程：
-
-![](/Users/Rocka/Desktop/Android Note/《Android 开发艺术探索》/images/ContentProvider.png)
+	![image](https://github.com/KevinRocka/ReadingNotes/blob/master/%E3%80%8AAndroid%20%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2%E3%80%8B/images/ContentProvider.png?raw=true)
 
 * 启动流程：
 	* 当一个应用启动时，入口方法是ActivityThread的main方法，其中创建ActivityThread的实例并创建主线程的消息队列

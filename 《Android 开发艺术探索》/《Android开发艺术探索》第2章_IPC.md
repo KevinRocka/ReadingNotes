@@ -29,7 +29,8 @@ Author : Rocka
 - `-`Binder
  * Binder 首先内部两个整形ID标记这两个方法，然后这两个id用于表示在transact过程中客户端到底是哪个方法，接着声明一个内部类Stub，这个内部类就是一个Binder类，客户端位于同一进程不走跨进程的transact方法，反之，这个逻辑有Proxy完成，Binder内部采用的是代理-存根的设计模式
  * 客户端通过IBinder.DeathRecipient来监听Binder死亡，也可以在onServiceDisconnected中监听并重连服务端。区别在于前者是在binder线程池中，访问UI需要用Handler，后者则是UI线程。
- * 工作机制： ![](/Users/Rocka/Desktop/Android Note/《Android 开发艺术探索》/images/Binder.png)
+ * 工作机制：
+	![image](https://github.com/KevinRocka/ReadingNotes/blob/master/%E3%80%8AAndroid%20%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2%E3%80%8B/images/Binder.png?raw=true)
 
  
 ## Android IPC的方式
