@@ -1,0 +1,50 @@
+#Chapter 8.Window
+
+Time : 2016.8.10 - 2016.8.11
+
+Author : Rocka 
+
+##  Window和WindowManager
+
+* Window实际是View的直接管理者。
+* Window是抽象类，具体实现是PhoneWindow，通过WindowManager就可以创建Window。
+WindowManager是外界访问Window入口，Window具体实现是在WindowManagerService中，WindowManager和WindoManagerService的交互是一个IPC。所有视图都是附加在Window上的
+* WindowManager.LayoutParams的Flags和Type参数
+	* Flags：
+		* FLAG_NOT_FOCUSABLE：表示window不需要获取焦点，也不需要接收各种输入事件。此标记会同时启用FLAG_NOT_TOUCH_MODAL，最终事件会直接传递给下层的具有焦点的window；
+		* FLAG_NOT_TOUCH_MODAL：在此模式下，系统会将window区域外的单击事件传递给底层的window，当前window区域内的单击事件则自己处理，一般都需要开启这个标记；
+		* FLAG_SHOW_WHEN_LOCKED：开启此模式可以让Window显示在锁屏的界面上
+	* Type(表示window的类型，层级范围越大越在上面)：
+		* 应用window:对应着一个Activity，层级范围是1~99
+		* 子window:不能独立存在，需要附属在特定的父window之上,比如Dilaog，层级范围是1000~1999
+		* 系统window:Toast和系统状态栏这些都是系统window，声明权限才能创建的window，层级范围是2000~2999
+
+
+##  Window的内部机制
+* Window是一个抽象的概念，不是实际存在的，它也是以View的形式存在。在实际使用中无法直接访问Window，只能通过WindowManager才能访问Window。每个Window都对应着一个View和一个ViewRootImpl，Window和View通过ViewRootImpl来建立联系。
+
+* Window的添加、删除和更新过程都是IPC过程，WindowManager的实现类对于addView、updateView和removeView方法都是委托给WindowManagerGlobal类，该类保存了很多List，window对应view的List，window对应的ViewRootImpl的List，之后的操作交给了ViewRootImpl处理，接着会通过WindowSession完成Window的添加过程，是一个IPC调用，最终通过WindowManagerService完成window添加的
+
+
+##  Window的创建过程
+
+* Activity的window创建过程
+	* 通过PolicyManager的makeNewWindow方法创建Window
+	* Window创建好之后，通过PhoneWindow的setContetnView将Activity与Window进行关联。
+	* Tips:
+		* Activity的启动过程很复杂，最终会由ActivityThread中的performLaunchActivity来完成整个启动过程，在这个方法内部会通过类加载器创建Activity的实例对象，并调用它的attach方法为其关联运行过程中所依赖的一系列上下文环境变量；
+		* Activity实现了Window的Callback接口，当window接收到外界的状态变化时就会回调Activity的方法，例如onAttachedToWindow、onDetachedFromWindow、dispatchTouchEvent等；
+		* Activity的Window是由PolicyManager来创建的，它的真正实现是Policy类，它会新建一个PhoneWindow对象，Activity的setContentView的实现是由PhoneWindow来实现的；
+		* Activity的顶级View是DecorView，它本质上是一个FrameLayout。如果没有DecorView，那么PhoneWindow会先创建一个DecorView，然后加载具体的布局文件并将view添加到DecorView的mContentParent中，最后就是回调Activity的onContentChanged通知Activity视图已经发生了变化；
+		* 还有一个步骤是让WindowManager能够识别DecorView，在ActivityThread调用handleResumeActivity方法时，首先会调用Activity的onResume方法，然后会调用makeVisible方法，这个方法中DecorView真正地完成了添加和显示过程。
+* Dialog的Window创建过程
+	* 通过PolicyManager的makeNewWindow方法创建Window
+	* 初始化DecorView并将Dialog的视图添加到DecorView中
+	* 将DecorView添加到Window中显示
+想要创建一个Application Context的Dialog 只需要申请权限以及设置dialog.getWindow().setType(LayoutParams.TYPE_SYSTEM_ERROR)
+* Toast的Window创建过程
+	* Toast内部有两类IPC: Toast访问NotificationManagerService(NMS)；NMS访问Toast的TN接口
+	* Toast属于系统Window，内部视图mNextView一种为系统默认样式，另一种通过setView方法来指定一个自定义View
+	* TN是一个Binder类，NMS处理Toast的显示和隐藏时候会跨进程回调TN的方法，所以TN运行在Binder线程池中，所以需要handler切换到当前发送Toast请求的线程中，没有Looper的线程无法弹出toast
+	* Toast的show()调用了NMS的enqueueToast(),该方法先将Toast请求封装到ToastRecord并放入mToastQueue队列，(非系统应用最多50个)，NMS通过showNextToastLocked()来显示当前View，Toast显示由ToastRecord的callback方法中show完成，callback其实是TN对象远程Binder，最终调用的是TN方法，并行运行在发起Toast请求应用的Binder线程池中
+	* 显示和隐藏都通过ToastRecord的callback回调TN的show，hide方法，然后通过handler发送两个runnable，里面的handleShow和handleHide方法是真正完成显示和隐藏Toast的地方。handleShow将Toast的视图添加到window中，handleHide方法将Toast视图从Window中移除
